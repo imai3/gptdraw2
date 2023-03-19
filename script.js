@@ -11,6 +11,7 @@ let penmode = "move"
 let color = [150, 255];
 let line = [1, 3]
 let num = 0
+const ten_haba = 30
 context.strokeStyle = `rgb(${color[num]},${color[num]},${color[num]})`
 context.lineWidth = line[num]
 
@@ -51,10 +52,14 @@ canvas.addEventListener('touchmove', (event) => {
 		const rect = canvas.getBoundingClientRect();
 		const x = event.touches[0].clientX - rect.left;
 		const y = event.touches[0].clientY - rect.top;
-		context.beginPath();
-		context.moveTo(lastX, lastY);
-		context.lineTo(x, y);
-		context.stroke();
+		const dx = (x - lastX) / ten_haba
+		const dy = (y - lastY) / ten_haba
+		for (let i = 0; i < ten_haba; i++) {
+			context.beginPath();
+			context.rect(lastX + dx * i, lastY + dy * i, 1, 1)
+			context.fillStyle = `rgb(${color[num]},${color[num]},${color[num]})`;
+			context.fill();
+		}
 		lastX = x;
 		lastY = y;
 	}
@@ -67,6 +72,11 @@ canvas.addEventListener('touchmove', (event) => {
 	}
 
 });
+
+
+setInterval(function() {
+
+})
 
 canvas.addEventListener('touchend', () => {
 	touching = false;
