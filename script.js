@@ -31,6 +31,7 @@ window.addEventListener("keydown", (event) => {
 	if (line[num] > 55) line[num] = 55
 	if (line[num] < 0) line[num] = 0
 	if (event.key == "0") penmode = "draw_only"
+	if (event.key == "p") penmode = "draw_merge"
 
 	context.strokeStyle = `rgb(${color[num]},${color[num]},${color[num]})`
 	context.lineWidth = line[num]
@@ -40,6 +41,7 @@ window.addEventListener("keyup", (event) => {
 	if (event.key == "Enter") penmode = "move";
 	if (event.key == ".") penmode = "move";
 	if (event.key == "0") penmode = "move";
+	if (event.key == "p") penmode = "move";
 	if (event.key == "+") num = (num + 1) % 2;
 })
 
@@ -88,21 +90,22 @@ canvas.addEventListener('touchmove', (event) => {
 	if (touching && penmode == "draw_only") {
 		for (let i = 0; i < ten_haba; i++) {
 			let this_pixel_color = context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0]
-			if ((only_color-range < this_pixel_color&&this_pixel_color<only_color+range)) draw_small_rect(lastX + dx * i, lastY + dy * i, color[num])
+			if ((only_color - range < this_pixel_color && this_pixel_color < only_color + range)) draw_small_rect(lastX + dx * i, lastY + dy * i, color[num])
+		}
+	}
+	if (touching && penmode == "draw_merge") {
+		for (let i = 0; i < ten_haba; i++) {
+			let this_pixel_color = context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0]
+			draw_small_rect(lastX + dx * i, lastY + dy * i, color[num] * 0.3 + this_pixel_color * 0.7)
 		}
 	}
 	if (touching && penmode == "pick") {
 		const imageData = context.getImageData(x, y, 1, 1);
 		color[num] = imageData.data[0]
 	}
-
-
 	lastX = x;
 	lastY = y;
-
 });
-
-
 
 canvas.addEventListener('touchend', () => {
 	touching = false;
