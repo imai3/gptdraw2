@@ -13,12 +13,13 @@ let line = [1, 3]
 let num = 0
 const ten_haba = 30
 let only_color = 999
+const range = 20
 context.strokeStyle = `rgb(${color[num]},${color[num]},${color[num]})`
 context.lineWidth = line[num]
 
 
 window.addEventListener("keydown", (event) => {
-	
+
 	if (event.key == "Enter") penmode = "draw";
 	if (event.key == ".") penmode = "pick";
 	if (event.key == "9") color[num] += 10
@@ -54,6 +55,15 @@ canvas.addEventListener('touchstart', (event) => {
 
 
 function draw_pixel(x, y, color) {
+	imageData = context.getImageData(x, y, 1, 1);
+	const pixels = imageData.data;
+	pixels[0] = color;
+	pixels[1] = color;
+	pixels[2] = color
+	context.putImageData(imageData, x, y);
+}
+
+function draw_small_rect(x, y, color) {
 	context.beginPath();
 	context.rect(x, y, 1, 1)
 	context.fillStyle = `rgb(${color},${color},${color})`;
@@ -63,38 +73,32 @@ function draw_pixel(x, y, color) {
 canvas.addEventListener('touchmove', (event) => {
 	if (penmode == "move") return
 	event.preventDefault();
+	const rect = canvas.getBoundingClientRect();
+	const x = event.touches[0].clientX - rect.left;
+	const y = event.touches[0].clientY - rect.top;
+	const dx = (x - lastX) / ten_haba
+	const dy = (y - lastY) / ten_haba
+
 	if (touching && penmode == "draw") {
-		const rect = canvas.getBoundingClientRect();
-		const x = event.touches[0].clientX - rect.left;
-		const y = event.touches[0].clientY - rect.top;
-		const dx = (x - lastX) / ten_haba
-		const dy = (y - lastY) / ten_haba
 		for (let i = 0; i < ten_haba; i++) {
-			draw_pixel(lastX + dx * i, lastY + dy * i, color[num])
+			console.log(context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0])
+			draw_small_rect(lastX + dx * i, lastY + dy * i, color[num])
 		}
-		lastX = x;
-		lastY = y;
+	}
+	if (touching && penmode == "draw_only") {
+		for (let i = 0; i < ten_haba; i++) {
+			let this_pixel_color = context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0]
+			if ((only_color-range < this_pixel_color&&this_pixel_color<only_color+range)) draw_small_rect(lastX + dx * i, lastY + dy * i, color[num])
+		}
 	}
 	if (touching && penmode == "pick") {
-		const rect = canvas.getBoundingClientRect();
-		const x = event.touches[0].clientX - rect.left;
-		const y = event.touches[0].clientY - rect.top;
 		const imageData = context.getImageData(x, y, 1, 1);
 		color[num] = imageData.data[0]
 	}
-	if (touching && penmode == "draw_only") {
-		const rect = canvas.getBoundingClientRect();
-		const x = event.touches[0].clientX - rect.left;
-		const y = event.touches[0].clientY - rect.top;
-		const dx = (x - lastX) / ten_haba
-		const dy = (y - lastY) / ten_haba
-		for (let i = 0; i < ten_haba; i++) {
-			let this_pixel_color = context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0]
-			if (only_color == this_pixel_color || color[num] == this_pixel_color) draw_pixel(lastX + dx * i, lastY + dy * i, color[num])
-		}
-		lastX = x;
-		lastY = y;
-	}
+
+
+	lastX = x;
+	lastY = y;
 
 });
 
