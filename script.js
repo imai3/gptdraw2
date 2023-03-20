@@ -18,6 +18,7 @@ context.lineWidth = line[num]
 
 
 window.addEventListener("keydown", (event) => {
+	
 	if (event.key == "Enter") penmode = "draw";
 	if (event.key == ".") penmode = "pick";
 	if (event.key == "9") color[num] += 10
@@ -88,7 +89,8 @@ canvas.addEventListener('touchmove', (event) => {
 		const dx = (x - lastX) / ten_haba
 		const dy = (y - lastY) / ten_haba
 		for (let i = 0; i < ten_haba; i++) {
-			if (only_color == context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0]) draw_pixel(lastX + dx * i, lastY + dy * i, color[num])
+			let this_pixel_color = context.getImageData(lastX + dx * i, lastY + dy * i, 1, 1).data[0]
+			if (only_color == this_pixel_color || color[num] == this_pixel_color) draw_pixel(lastX + dx * i, lastY + dy * i, color[num])
 		}
 		lastX = x;
 		lastY = y;
